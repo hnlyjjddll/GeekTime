@@ -3,10 +3,12 @@ CXX = g++
 MYFLAGS = -std=c++11 -Wall
 
 INC += \
-	-I /mnt/f/study/3rd/googletest/googlemock/include		\
-	-I /mnt/f/study/3rd/googletest/googletest/includ:e  \
+	-I /mnt/f/study/3rd/googletest/googlemock/include \
+	-I /mnt/f/study/3rd/googletest/googletest/include \
 
-LIB += -lpthread
+LIB += -lgtest \
+        -lgtest_main \
+        -lpthread
 
 TAR_DIR = ./bin
 SRC_DIR = ./src
