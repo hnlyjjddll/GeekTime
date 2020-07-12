@@ -8,6 +8,8 @@ INC += \
 
 LIB += -lgtest \
         -lgtest_main \
+        -lgmock \
+        -lgmock_main \
         -lpthread
 
 TAR_DIR = ./bin

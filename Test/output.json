@@ -1,0 +1,48 @@
+{
+  "tests": 2,
+  "failures": 1,
+  "disabled": 0,
+  "errors": 0,
+  "timestamp": "2020-07-12T11:08:13Z",
+  "time": "0.018s",
+  "name": "AllTests",
+  "testsuites": [
+    {
+      "name": "FooTest",
+      "tests": 2,
+      "failures": 1,
+      "disabled": 0,
+      "errors": 0,
+      "timestamp": "2020-07-12T11:08:13Z",
+      "time": "0.013s",
+      "testsuite": [
+        {
+          "name": "testFun",
+          "status": "RUN",
+          "result": "COMPLETED",
+          "timestamp": "2020-07-12T11:08:13Z",
+          "time": "0.001s",
+          "classname": "FooTest"
+        },
+        {
+          "name": "testFun2",
+          "status": "RUN",
+          "result": "COMPLETED",
+          "timestamp": "2020-07-12T11:08:13Z",
+          "time": "0.008s",
+          "classname": "FooTest",
+          "failures": [
+            {
+              "failure": "src\/unit_test.cpp:40\nExpected equality of these values:\n  iRet\n    Which is: 1\n  0\nvalue is error",
+              "type": ""
+            },
+            {
+              "failure": "src\/unit_test.cpp:41\nExpected equality of these values:\n  iRet\n    Which is: 1\n  0",
+              "type": ""
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
