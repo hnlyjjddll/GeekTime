@@ -6,10 +6,11 @@
 #define STUDY_FOO_H
 #include <string>
 
-namespace Foo{
+namespace Fooo{
     struct Foo{
     public:
-        int testFun(int i,std::string s);
+        virtual int testFun(int i,std::string s);
+        void fun();
     };
 }
 

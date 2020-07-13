@@ -5,7 +5,10 @@
 #include <iostream>
 #include "gtest/gtest.h"
 #include "gmock/gmock.h"
+//#include "Foo.h"
 using namespace std;
+using namespace testing;
+//using Fooo::Foo;
 
 void f2(){
     cout<<"f2"<<endl;
@@ -17,7 +20,18 @@ int fun1(){
     return 0;
 }
 
-class FooTest : public ::testing::Test {
+class Boo{
+public:
+    virtual int testFun(int i,std::string str) {std::cout<<"111"<<std::endl;};
+    void fun() {testFun(1,"2");}
+};
+
+class FooMock:public Boo{
+public:
+    MOCK_METHOD(int,testFun,(int i,std::string str),(override));
+};
+
+class FooTest : public ::testing::Test{
 protected:
     void SetUp() override {
         cout<<"SetUp"<<endl;
@@ -58,17 +72,25 @@ protected:
 
 
 TEST_F(FooTest, testFun) {
+
+    FooMock fooMock;
+    EXPECT_CALL(fooMock,testFun(_,_)).
+    Times(AtLeast(1)).
+    WillOnce([](int i,std::string s){std::cout<<"123"<<std::endl; return 0;});
+    Boo* boo = &fooMock;
+    boo->fun();
+
     int32_t iRet = 0;
 
     EXPECT_EQ(iRet,0);
 }
 
-TEST_F(FooTest, testFun2) {
+/*TEST_F(FooTest, testFun2) {
     int32_t iRet = 1;
 
     EXPECT_EQ(iRet,0) << "value is error";
     ASSERT_EQ(iRet, 0);
-}
+}*/
 
 TEST_F(ZooTest, testFun){
     int32_t iRet = 0;

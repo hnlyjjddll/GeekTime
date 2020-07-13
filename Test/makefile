@@ -5,6 +5,7 @@ MYFLAGS = -std=c++11 -Wall
 INC += \
 	-I /mnt/f/study/3rd/googletest/googlemock/include \
 	-I /mnt/f/study/3rd/googletest/googletest/include \
+	-I /mnt/f/study/3rd/GeekTime/Test/src \
 
 LIB += -lgtest \
         -lgtest_main \
@@ -19,6 +20,7 @@ BIN_TARGET = $(TAR_DIR)/unit_test
 
 BIN_TARGET_OBJS = \
 		$(OBJ_DIR)/unit_test.o	\
+		$(OBJ_DIR)/Foo.o	\
 
 all: init $(BIN_TARGET)
 	@echo -e "\033[1;32m\nSuccess!\033[0m"
