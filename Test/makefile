@@ -6,6 +6,7 @@ INC += \
 	-I /mnt/f/study/3rd/googletest/googlemock/include \
 	-I /mnt/f/study/3rd/googletest/googletest/include \
 	-I /mnt/f/study/3rd/GeekTime/Test/src \
+	-I /mnt/f/study/3rd/easymock \
 
 LIB += -lgtest \
         -lgtest_main \
