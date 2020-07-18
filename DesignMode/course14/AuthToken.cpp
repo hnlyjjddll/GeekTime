@@ -18,14 +18,16 @@ bool AuthToken::IsExpired() const{
             &&  ddwCurrentTime < m_ddwCreateTime + EXPIRE_INTERVAL;
 }
 
-bool AuthToken::Match(const std::string& strToken){
-    std::string strTmpToken = _GenerateToken(MysqlAuthData());
-    return strToken == strTmpToken;
+bool AuthToken::Match(const AuthToken& oAuthToken){
+    return oAuthToken.m_strToken == m_strToken;
 }
 
-std::string AuthToken::_GenerateToken(const AbstractAuthData& oAuthData) {
+AuthToken AuthToken::GenerateToken(const std::string& strUrl,const std::string& strAppsecret) {
     //省略sha过程
-    const auto& strAppSecret = oAuthData.GetAppsecretByAppid(m_strAppid);
-    return strAppSecret + "others";
+    std::string strToken = strUrl + strAppsecret + "others";
+    auto curTime = chrono::time_point_cast<chrono::milliseconds>(chrono::system_clock::now());
+    uint64_t ddwCurrentTime = curTime.time_since_epoch().count();
+
+    return AuthToken(strToken,m_strAppid,ddwCurrentTime);
 }
 

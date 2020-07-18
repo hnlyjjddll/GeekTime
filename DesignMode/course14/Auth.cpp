@@ -4,21 +4,26 @@
 
 #include "Auth.h"
 #include "AuthToken.h"
+#include "AuthData.h"
 
 int32_t Auth::AuthRequest(const AbstractApiRequest& oApiRequest){
     const auto& strAppid = oApiRequest.GetAppid();
     const auto& strToken = oApiRequest.GetToken();
     const auto& ddwCreateTime = oApiRequest.GetCreateTime();
 
-    AuthToken authToken("",strAppid,ddwCreateTime);
+    AuthToken oClientToken(strToken,strAppid,ddwCreateTime);
 
     //校验请求是否在有效时间内
-    if(!authToken.IsExpired()){
+    if(!oClientToken.IsExpired()){
         //请求无效
         return -1;
     }
 
-    if(!authToken.Match(strToken)){
+    std::string strAppSecret = MysqlAuthData().GetAppsecretByAppid(strAppid);
+
+    auto oServerToken = oClientToken.GenerateToken("",strAppSecret);
+
+    if(!oServerToken.Match(oClientToken)){
         //Token 不匹配
         return -2;
     }

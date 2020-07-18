@@ -9,7 +9,7 @@
 using namespace std;
 
 int main(void) {
-    UrlApiRequestBody oUrlRequestBody("www","appid","token",1595062800000);
+    UrlApiRequestBody oUrlRequestBody("www","appid","token",1595064960000);
     int32_t iRet = Auth().AuthRequest(UrlApiRequest(oUrlRequestBody));
     cout<<iRet<<endl;
     return 0;
