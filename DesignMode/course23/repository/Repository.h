@@ -10,8 +10,8 @@
 namespace Repository{
     class AbstractRepositoryAccess{
     public:
-        virtual int32_t Read(const std::string& m_strReq, std::string& m_strResp) = 0;
-        virtual int32_t Write(const std::string& m_strReq, std::string& m_strResp) = 0;
+        virtual int32_t Read(const std::string& m_strReq, std::string& m_strResp) {}
+        virtual int32_t Write(const std::string& m_strReq, std::string& m_strResp){}
     };
 
     class MysqlRepositoryAccess: public AbstractRepositoryAccess {
