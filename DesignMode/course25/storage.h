@@ -10,7 +10,7 @@ namespace Storage{
     public:
         //需要统一读写格式，包括入参和返回数据格式
         virtual int32_t Write();
-        virtual int32_t Read();
+        virtual int32_t Read(); //一次性取太长时间区间的数据，可能会导致拉取太多的数据到内存中，有可能会撑爆内存
     };
 
     class RedisStorage: public AbstractStorage{
