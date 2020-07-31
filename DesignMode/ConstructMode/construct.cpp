@@ -30,7 +30,10 @@ public:
     class ServerConfigBuild{
     public:
         friend class ServerConfig;
-        ServerConfigBuild(const std::string& strServerName):m_strServerName(strServerName){}
+        ServerConfigBuild(const std::string& strServerName):m_strServerName(strServerName){
+            m_dwMaxNum = 8;
+            m_dwMinNum = 0;
+        }
         void SetMaxNum(int32_t dwMaxNum){m_dwMaxNum = dwMaxNum;}
         void SetMinNum(int32_t dwMinNum){m_dwMinNum = dwMinNum;}
         std::shared_ptr<ServerConfig> Build(){
@@ -49,11 +52,12 @@ public:
 int main(void){
     ServerConfig::ServerConfigBuild oBuildCfg("123");
     oBuildCfg.SetMaxNum(8);
-    oBuildCfg.SetMinNum(0);
+    oBuildCfg.SetMinNum(9);
 
     auto poCfg = oBuildCfg.Build();
     if(!poCfg){
         cout<<"build fail"<<endl;
+        return -1;
     }
 
     cout<<poCfg->GetServerName()<<endl;
