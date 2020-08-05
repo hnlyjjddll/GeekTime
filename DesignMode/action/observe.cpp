@@ -6,12 +6,14 @@
 #include <string>
 #include <vector>
 #include <memory>
+#include <thread>
+#include <functional>
 
 using namespace std;
 
 class Observer{
 public:
-    virtual void Notify() = 0;
+    virtual void Notify() {};
 };
 
 class ActivitySystem:public Observer{
@@ -30,8 +32,16 @@ public:
 
 class PayAction{
 public:
+    PayAction(){
+        for(int i=0; i<5; ++i){
+            thread t(&Observer::Notify,Observer());
+            t.detach();
+            m_threadList.push_back(std::move(t));
+        }
+    }
+
     void Notify(){
-        for(const auto poObserver: m_vecObserverList){
+        for(int i = 0; i<m_vecObserverList.size(); ++i){
             poObserver->Notify();
         }
     }
@@ -40,6 +50,7 @@ public:
     }
 private:
     vector<shared_ptr<Observer>> m_vecObserverList;
+    vector<thread> m_threadList;
 };
 
 int main(void){
