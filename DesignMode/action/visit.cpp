@@ -4,22 +4,30 @@
 
 #include "visit.h"
 
-void PdfFile::ExtractFile2Txt(Extract& oExtract){
-    cout<<"extract pdf file"<<endl;
-    oExtract.ExtractFile2Txt(*this);
+void PdfFile::Visit(Visitor& oVisit){
+    cout<<"visit pdf file"<<endl;
+    oVisit.Visit(*this);
 }
 
-void WordFile::ExtractFile2Txt(Extract& oExtract){
-    cout<<"extract word file"<<endl;
-    oExtract.ExtractFile2Txt(*this);
+void WordFile::Visit(Visitor& oVisit){
+    cout<<"visit word file"<<endl;
+    oVisit.Visit(*this);
 }
 
-void Extract::ExtractFile2Txt(PdfFile& oPdfFile){
+void Extract::Visit(PdfFile& oPdfFile){
     cout<<"do extract pdf file"<<endl;
 }
 
-void Extract::ExtractFile2Txt(WordFile& oPdfFile){
+void Extract::Visit(WordFile& oPdfFile){
     cout<<"do extract word file"<<endl;
+}
+
+void Compress::Visit(PdfFile& oPdfFile){
+    cout<<"do compress pdf file"<<endl;
+}
+
+void Compress::Visit(WordFile& oPdfFile){
+    cout<<"do compress word file"<<endl;
 }
 
 
@@ -28,8 +36,10 @@ int main(void){
     vecFile.push_back(make_shared<PdfFile>());
     vecFile.push_back(make_shared<WordFile>());
     Extract oExtract;
+    Compress oCompress;
     for(auto poFile: vecFile){
-        poFile->ExtractFile2Txt(oExtract);
+        poFile->Visit(oExtract);
+        poFile->Visit(oCompress);
     }
     return 0;
 }

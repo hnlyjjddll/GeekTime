@@ -12,28 +12,40 @@
 
 using namespace std;
 
-class Extract;
+class Visitor;
 
 class IFile{
 public:
-    virtual void ExtractFile2Txt(Extract& oExtract){}
+    virtual void Visit(Visitor& oVisit){}
 };
 
 class PdfFile:public IFile{
 public:
-    void ExtractFile2Txt(Extract& oExtract);
+    void Visit(Visitor& oVisit);
 };
 
 class WordFile:public IFile{
 public:
-    void ExtractFile2Txt(Extract& oExtract);
+    void Visit(Visitor& oVisit);
 };
 
-class Extract{
+class Visitor{
 public:
-    void ExtractFile2Txt(PdfFile& oPdfFile);
-
-    void ExtractFile2Txt(WordFile& oPdfFile);
+    virtual void Visit(PdfFile& oPdfFile){}
+    virtual void Visit(WordFile& oWordFile){}
 };
+
+class Extract: public Visitor{
+public:
+    void Visit(PdfFile& oPdfFile);
+    void Visit(WordFile& oPdfFile);
+};
+
+class Compress: public Visitor{
+public:
+    void Visit(PdfFile& oPdfFile);
+    void Visit(WordFile& oPdfFile);
+};
+
 
 #endif //STUDY_VISIT_H
