@@ -4,7 +4,14 @@
 
 #include <iostream>
 #include <string>
+#include <chrono>
+#include <climits>
 using namespace std;
+
+uint64_t GetMsTime(){
+    auto msec = chrono::time_point_cast<chrono::milliseconds>(chrono::system_clock::now());
+    return msec.time_since_epoch().count();
+}
 
 template<class Elem>
 class Iterator{
@@ -17,9 +24,13 @@ public:
 template<class Elem>
 class ListNode{
 public:
-    ListNode(Elem oE):m_oValue(oE),m_poNext(nullptr){}
+    ListNode(Elem oE):m_oValue(oE),m_poNext(nullptr),m_ddwCreateTime(GetMsTime()),m_ddwDeleteTime(ULONG_MAX){
+        cout<<"ListNode create time: "<<m_ddwCreateTime<<endl<<"delete time: "<<m_ddwDeleteTime<<endl;
+    }
     Elem m_oValue;
     ListNode<Elem>* m_poNext;
+    uint64_t m_ddwCreateTime;
+    uint64_t m_ddwDeleteTime;
 };
 
 template<class Elem>
@@ -45,6 +56,18 @@ public:
         return new ArraryIterator(*this);
     }
 
+    void Remove(const Elem& oE){
+        auto poTmp = m_poBegin;
+        while(poTmp){
+            if(poTmp->m_oValue == oE){
+                poTmp->m_ddwDeleteTime = GetMsTime();
+                cout<<"remove time: "<<poTmp->m_ddwDeleteTime<<endl;
+                break;
+            }
+            poTmp = poTmp->m_poNext;
+        }
+    }
+
 //private:
     uint32_t m_dwCount;
     ListNode<Elem>* m_poBegin;
@@ -55,33 +78,60 @@ public:
     public:
         ArraryIterator(ArraryList<Elem>& oArraryList):m_poArrayList(&oArraryList){
             m_poCurrent = oArraryList.m_poBegin;
+            m_ddwCreateTime = GetMsTime();
+            cout<<"iteraotr create time: "<<m_ddwCreateTime<<endl;
         }
 
         bool HasNext() override {
             if(!m_poArrayList) return false;
 
-            if(!m_poCurrent && m_poArrayList->Size()>0){
-                m_poCurrent = m_poArrayList->m_poBegin;
-                return true;
+            auto poTmp = m_poCurrent;
+            while(poTmp&&poTmp->m_poNext){
+                poTmp = poTmp->m_poNext;
+                if(poTmp->m_ddwCreateTime<m_ddwCreateTime
+                   && poTmp->m_ddwDeleteTime>m_ddwCreateTime){
+                    return true;
+                }
+
+                poTmp = poTmp->m_poNext;
             }
 
-            return m_poCurrent->m_poNext != nullptr;
+            return false;
         }
 
         Elem* GetCurrent() override{
-            if(!m_poArrayList || !m_poCurrent){
+            if(!m_poArrayList){
                 return nullptr;
             }
 
-            return &(m_poCurrent->m_oValue);
+            while(m_poCurrent){
+                if(m_poCurrent->m_ddwCreateTime<m_ddwCreateTime
+                      && m_poCurrent->m_ddwDeleteTime>m_ddwCreateTime){
+                    return &(m_poCurrent->m_oValue);
+                }
+
+                m_poCurrent = m_poCurrent->m_poNext;
+            }
+
+            return nullptr;
         }
 
         void Next()override {
             m_poCurrent = m_poCurrent->m_poNext;
+            while(m_poCurrent){
+
+                if(m_poCurrent->m_ddwCreateTime<m_ddwCreateTime
+                   && m_poCurrent->m_ddwDeleteTime>m_ddwCreateTime){
+                    break;
+                }
+
+                m_poCurrent = m_poCurrent->m_poNext;
+            }
         }
     private:
         ListNode<Elem>* m_poCurrent;
         ArraryList<Elem>* m_poArrayList;
+        uint64_t m_ddwCreateTime;
     };
 };
 
@@ -93,9 +143,16 @@ int main(void){
     //cout<<iArray.Size()<<endl;
 
     auto poIter = iArray.GetIterator();
-    while(poIter->GetCurrent()){
+    while(poIter){
         auto poTmp = poIter->GetCurrent();
-        cout<<*poTmp<<endl;
+        if(poTmp){
+            cout<<*poTmp<<endl;
+        }
+
+        if(!poIter->HasNext()){
+            break;
+        }
+
         poIter->Next();
     }
 
@@ -104,11 +161,19 @@ int main(void){
     sArray.Add("123");
     sArray.Add("dsafagdsgd");
     //cout<<iArray.Size()<<endl;
+    sArray.Remove("123");
 
     auto poIter2 = sArray.GetIterator();
-    while(poIter2->GetCurrent()){
+    while(poIter2){
         auto poTmp = poIter2->GetCurrent();
-        cout<<*poTmp<<endl;
+        if(poTmp){
+            cout<<*poTmp<<endl;
+        }
+
+        if(!poIter2->HasNext()){
+            break;
+        }
+
         poIter2->Next();
     }
     return 0;
