@@ -98,5 +98,18 @@ int main(void){
         cout<<*poTmp<<endl;
         poIter->Next();
     }
+
+    ArraryList<string> sArray;
+    //cout<<iArray.Size()<<endl;
+    sArray.Add("123");
+    sArray.Add("dsafagdsgd");
+    //cout<<iArray.Size()<<endl;
+
+    auto poIter2 = sArray.GetIterator();
+    while(poIter2->GetCurrent()){
+        auto poTmp = poIter2->GetCurrent();
+        cout<<*poTmp<<endl;
+        poIter2->Next();
+    }
     return 0;
 }
