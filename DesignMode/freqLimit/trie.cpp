@@ -51,7 +51,6 @@ class TrieNode{
         void SetCompleteFlag(bool bFlag){m_bIsComplete = bFlag;}
         void SetFreqLimitCnt(uint32_t dwCnt){m_dwFreqLimitCnt = dwCnt;}
         bool IsComplete(){return m_bIsComplete;}
-        bool IsLeafNode(){return m_poMapNode.empty();}
 
         void Print(){
             cout<<m_strVal<<endl;
@@ -82,10 +81,10 @@ class Trie{
                 if(!poTmp){//未找到节点
                     cout<<"not find node"<<endl;
                     vector<string> vecTmp(iter,vecNode.end());
-                    for(const auto& strNode: vecTmp){
+                    /*for(const auto& strNode: vecTmp){
                         cout<<strNode<<endl;
-                    }
-                    Insert(poNode,vecTmp,dwFreqLimitCnt);
+                    }*/
+                    _Insert(poNode,vecTmp,dwFreqLimitCnt);
                     return;
                 }
 
@@ -98,7 +97,40 @@ class Trie{
             }
         }
 
-        void Insert(shared_ptr<TrieNode> poBeg, const vector<string>& vecInsertNode,const uint32_t dwFreqLimitCnt){
+        shared_ptr<TrieNode> Find(const string& strKey, bool& bIsFind){
+            cout<<"begin find"<<endl;
+            vector<string> vecNode;
+            Split2Vector(strKey,"/",vecNode);
+            auto poNode = m_poRootNode;
+            for(const auto& strNode: vecNode){
+                auto poTmp = poNode->GetNode(strNode); //寻找匹配
+                if(!poTmp){//未找到节点
+                    bIsFind = false;
+                    cout<<"not find. the before node value is: "<<poNode->GetValue()<<endl;
+                    return poNode; //返回上一层节点
+                }
+
+                poNode = poTmp;
+            }
+
+            if(!poNode->IsComplete()){
+                cout<<"find but not complete: "<<poNode->GetValue()<<endl;
+                bIsFind = false;
+                return poNode;
+            }
+
+            bIsFind = true;
+            cout<<"find. the last node value is: "<<poNode->GetValue()<<" freqlimit: "<<poNode->GetFreqLimitCnt()<<endl;
+            return poNode;
+        }
+
+        void Print(){
+            cout<<"begin print"<<endl;
+            m_poRootNode->Print();
+        }
+
+private:
+        void _Insert(shared_ptr<TrieNode> poBeg, const vector<string>& vecInsertNode,const uint32_t dwFreqLimitCnt){
             cout<<"begin insert"<<endl;
             auto poNode = poBeg;
             for(int i=0; i<vecInsertNode.size();++i){
@@ -113,37 +145,6 @@ class Trie{
                 }
             }
         }
-
-        shared_ptr<TrieNode> Find(const string& strKey, bool& bIsFind){
-            cout<<"begin find"<<endl;
-            vector<string> vecNode;
-            Split2Vector(strKey,"/",vecNode);
-            auto poNode = m_poRootNode;
-            for(const auto& strNode: vecNode){
-                auto poTmp = poNode->GetNode(strNode); //寻找匹配
-                if(!poTmp){//未找到节点
-                    bIsFind = false;
-                    return poNode; //返回上一层节点
-                }
-
-                poNode = poTmp;
-            }
-
-            if(!poNode->IsComplete()){
-                cout<<"not complete: "<<poNode->GetValue()<<endl;
-                bIsFind = false;
-                return poNode;
-            }
-
-            bIsFind = true;
-            return poNode;
-        }
-
-        void Print(){
-            cout<<"begin print"<<endl;
-            m_poRootNode->Print();
-        }
-
     private:
         shared_ptr<TrieNode> m_poRootNode;
 };
@@ -160,13 +161,10 @@ int main(void){
     oTrie.Print();
     bool bIsFind;
     auto poNode = oTrie.Find("/china/liaoning/jinzhou",bIsFind);
-    if(poNode){
-        if(bIsFind){
-            cout<<"find. the last node value is: "<<poNode->GetValue()<<" freqlimit: "<<poNode->GetFreqLimitCnt()<<endl;
-        }else{
-            cout<<"not find. the before node value is: "<<poNode->GetValue()<<endl;
-        }
-    }
+    poNode = oTrie.Find("/america/cair",bIsFind);
+    oTrie.Find("/china/hunan/hengyang",bIsFind);
+    oTrie.Find("beijing",bIsFind);
+    oTrie.Find("/china/hunan/hengyang/leiyang/zheqiao/miaoxia",bIsFind);
     return 0;
 }
 
