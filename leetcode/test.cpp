@@ -48,8 +48,10 @@ public:
 
 
 int main(void){
-    vector<int> iVec{2,1,2,2,2};
-    Solution s;
-    cout<<s.search(iVec,1)<<endl;
+    //vector<int> iVec{2,1,2,2,2};
+    //Solution s;
+    //cout<<s.search(iVec,1)<<endl;
+    int* p;
+    cout<<sizeof(p)<<endl;
     return 0;
 }
