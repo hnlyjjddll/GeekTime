@@ -1,5 +1,6 @@
 #include <iostream>
 #include <vector>
+#include <stack>
 
 using namespace std;
 
@@ -47,5 +48,7 @@ int main(void){
     cout<<elem<<endl;
     elem = 2;
     cout<<stk.top()<<endl;
+
+    
     return 0;
 }

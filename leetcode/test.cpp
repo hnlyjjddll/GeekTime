@@ -1,57 +1,75 @@
 #include <list>
 #include <iostream>
 #include <vector>
+#include <deque>
+#include <set>
+#include <map>
+#include <unordered_map>
 
 using namespace std;
 
 class Solution {
 public:
-    int search(vector<int>& arr, int target) {
-        int low = 0,high=arr.size()-1;
-        while(low<=high){
-            int mid = low + ((high-low)>>1);
-            if(arr[mid]==target || arr[0] == target){
-                if(arr[0] == target){
-                    return 0;
-                }
-                
-                if(arr[mid-1]!=target){
-                    return mid;
-                }
-
-                high = mid - 1;
-                
-            }else if(arr[low]<=arr[mid] && arr[low] != arr[mid]){//左半边是升序
-                cout<<"left order"<<endl;
-                if(target>=arr[low] && target < arr[mid]){
-                    cout<<"left left"<<endl;
-                    high = mid - 1;
-                }else{
-                    cout<<"left right"<<endl;
-                    low = mid + 1;
-                }
-            }else{//右半边是升序
-                cout<<"right order"<<endl;
-                if(target>arr[mid] && target<=arr[high]){
-                    cout<<"right right"<<endl;
-                    low = mid + 1;
-                }else{
-                    cout<<"right left"<<endl;
-                    high = mid - 1;
-                }
-            }
+    vector<vector<string>> partition(string s) {
+        if(s.empty()){
+            return result;
         }
 
-        return -1;
+        vector<string> curPartition;
+        _dfsTraverse(s,0,s.size()-1,curPartition);
+        return result;
     }
+private:
+    void _dfsTraverse(const string& s, int beg,int end,vector<string>& curPartition){
+        if(beg > end){
+            return;
+        }
+
+        if(beg == end){
+            curPartition.push_back(s.substr(beg,1));
+            result.push_back(curPartition);
+        }
+
+        for(int i=beg; i<end; ++i){
+            if(_isReverseString(s,beg,i)){
+                if(_isReverseString(s,beg+1,end)){
+                    curPartition.push_back(s.substr(beg,i-beg+1));
+                    curPartition.push_back(s.substr(beg+1,end-beg));
+                    
+                    result.push_back(curPartition);
+                    curPartition.pop_back();
+                }
+                _dfsTraverse(s,i+1,end,curPartition);
+            }
+        }
+    }
+
+    bool _isReverseString(string s,int beg,int end){
+        while(beg<=end){
+            if(s[beg] != s[end]){
+                return false;
+            }
+            ++beg;
+            --end;
+        }
+
+        return true;
+    }
+private:
+    vector<vector<string>> result;
 };
 
-
 int main(void){
-    //vector<int> iVec{2,1,2,2,2};
-    //Solution s;
-    //cout<<s.search(iVec,1)<<endl;
-    int* p;
-    cout<<sizeof(p)<<endl;
+    Solution s;
+    vector<vector<string>> result;
+    result = s.partition("aab");
+
+    for(const auto& item: result){
+        for(const auto& str: item){
+            cout<<str<<" ";
+        }
+        cout<<endl;
+    }
+
     return 0;
 }
