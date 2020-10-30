@@ -8,131 +8,174 @@
 #include <queue>
 
 using namespace std;
+struct ListNode {
+    int val;
+    ListNode *next;
+    ListNode() : val(0), next(nullptr) {}
+    ListNode(int x) : val(x), next(nullptr) {}
+    ListNode(int x, ListNode *next) : val(x), next(next) {}
+ };
 
-struct TreeNode {
-      int val;
-      TreeNode *left;
-      TreeNode *right;
-      TreeNode(int x) : val(x), left(NULL), right(NULL) {}
-  };
- 
-class Codec {
+struct HeapNode{
+    int val;
+    int pos;
+    HeapNode(int v,int p):val(v),pos(p){}
+};
+
+class Heap{
 public:
-
-    // Encodes a tree to a single string.
-    string serialize(TreeNode* root) {
-        if(!root){
-            return "@";
-        }
-
-        string str("");
-        queue<TreeNode*> qset;
-        qset.push(root);
-        TreeNode* lastNode = root;
-        while(!qset.empty()){
-            auto pNode = qset.front();
-            qset.pop();
-            if(!pNode){
-                str = (str==""?"":str+"#") + "@";
-                continue;
-            }
-
-            str = (str==""?"":str+"#") + to_string(pNode->val);
-            
-            qset.push(pNode->left);
-            qset.push(pNode->right);
-            
-            if(pNode == lastNode && !qset.empty()){
-                lastNode = qset.back();
-            }
-        }
-
-        int i = str.rfind("@#",0);
-        cout << i<<endl;
-        return str;
+    Heap(const vector<HeapNode>& nums):m_vecHeap(nums){
+        _buildHeap(m_vecHeap,0,nums.size()-1);
     }
 
-    // Decodes your encoded data to tree.
-    TreeNode* deserialize(string data) {
-        if(data.empty()){
+    /*int addAndGetNode(int val){
+        int result = m_vecHeap[0];
+        m_vecHeap[0] = val;
+        _adjustHeap(m_vecHeap,0,m_vecHeap.size()-1);
+        return result;
+    }*/
+
+    HeapNode getNode() const {
+        return m_vecHeap[0];
+    }
+
+    void putNode(const HeapNode& node){
+        m_vecHeap[0] = node;
+        _adjustHeap(m_vecHeap,0,m_vecHeap.size()-1);
+    }
+
+    void sort(ListNode* pCur){
+        for(int i = m_vecHeap.size()-1;i>=0;--i){
+            _adjustHeap(m_vecHeap,0,i);
+            pCur->next = new ListNode(m_vecHeap[0].val);
+            pCur = pCur->next;
+            swap(m_vecHeap[0],m_vecHeap[i]);
+        }
+    }
+
+private:
+    //自顶向下构建小顶堆
+    void _buildHeap(vector<HeapNode>& nums,int low,int high){
+        if(low>=high){
+            return;
+        }
+
+        int noLeef = (high-1)/2; //第一个非叶节点对应下标
+        for(int i=noLeef;i>=0;--i){
+            while(2*i+1<=high){//非叶子节点
+                int left = 2*i+1,right=2*i+2,min=left;
+
+                if(right<=high && nums[right].val<nums[left].val){
+                    min = right;
+                }
+
+                if(nums[i].val<=nums[min].val){//已经是小顶堆
+                    break;
+                }
+
+                swap(nums[i],nums[min]);
+                i = min;
+            }
+        }
+    }
+
+    //自顶向下调整小顶堆
+    void _adjustHeap(vector<HeapNode>& nums,int low,int high){
+        if(low>=high){
+            return;
+        } 
+
+        int i = low;
+        while(2*i+1<=high){
+            int left = 2*i+1,right=2*i+2,min = left;
+            if(right<=high && nums[right].val<nums[left].val){
+                min = right;
+            }
+
+            if(nums[i].val <= nums[min].val){//已经是小顶堆
+                break;
+            }
+
+            swap(nums[i],nums[min]);
+            i = min;
+        }
+    }
+
+private:
+    vector<HeapNode> m_vecHeap;
+};
+
+
+class Solution {
+public:
+    ListNode* mergeKLists(vector<ListNode*>& vecListSet) {
+
+        if(vecListSet.empty()){
             return nullptr;
         }
 
-        vector<string> vecStr;
-        _splitString2Vector(data,vecStr);
-        return _resumeBinaryTree(vecStr);
+        vector<HeapNode> iVec;
+        for(int i=0;i<vecListSet.size();++i){
+            if(vecListSet[i]){
+                iVec.push_back(HeapNode(vecListSet[i]->val,i));
+            }
+        }
+
+        Heap* pHeap = new Heap(iVec);
+        ListNode* pResult=new ListNode,*pCur=pResult;
+        while(!iVec.empty()){
+            HeapNode result = pHeap->getNode();
+            pCur->next = vecListSet[result.pos];
+            pCur = pCur->next;
+            vecListSet[result.pos] = vecListSet[result.pos]->next;
+            int pos = -1;
+            if(!vecListSet[result.pos]){
+                pos = _GetMin(vecListSet);
+                if(pos == -1){
+                    break;
+                }
+            }
+            pHeap->putNode(HeapNode(vecListSet[pos]->val,pos));
+        }
+
+        pHeap->sort(pCur);
+        return pResult->next;
     }
 private:
-    TreeNode* _resumeBinaryTree(const vector<string>& vecStr){
-        if(vecStr.empty() || vecStr[0] == "@"){
-            return nullptr;
-        }
-
-        TreeNode* root = new TreeNode(stoi(vecStr[0]));
-        queue<TreeNode*> qset;
-        qset.push(root);
-        int curPos = 1;
-        int size = vecStr.size();
-        
-        while(!qset.empty() && curPos<size){
-            auto pNode = qset.front();
-            qset.pop();
-            if(curPos < size){
-                if(vecStr[curPos] != "@"){
-                    pNode->left = new TreeNode(stoi(vecStr[curPos]));
-                    qset.push(pNode->left);
+    int _GetMin(vector<ListNode*> vecListSet){
+        int pos = -1,val=INT32_MAX;
+        for(int i=0;i<vecListSet.size();++i){
+            if(vecListSet[i]){
+                if(vecListSet[i]->val<val){
+                    pos = i;
+                    val = vecListSet[i]->val;
                 }
-                ++curPos;
-                if(curPos < size){
-                    if(vecStr[curPos] != "@"){
-                        pNode->right = new TreeNode(stoi(vecStr[curPos]));
-                        qset.push(pNode->right);
-                    }
-                }
-                ++curPos;
             }
         }
 
-        return root;
-    }
-
-    void _splitString2Vector(const string& data, vector<string>& vecStr){
-        int i=0,j=0,size=data.size();
-        for(;j<size;++j){
-            if(data[j] == '#'){
-                vecStr.push_back(data.substr(i,j-i));
-                i = j+1;
-            }
-        }
-
-        vecStr.push_back(data.substr(i,j-i));
+        return pos;
     }
 };
 
-void PrintTreeNode(TreeNode* root){
-    if(!root){
-        return;
-    }
 
-    cout<<root->val<<" ";
-    PrintTreeNode(root->left);
-    PrintTreeNode(root->right);
+ListNode* makeLink(const vector<int>& ivec){
+    if(ivec.empty()){
+        return nullptr;
+    }
+    ListNode* head = new ListNode(ivec[0]);
+    ListNode* p = head;
+    for(int i=1;i<ivec.size();++i){
+       p->next = new ListNode(ivec[i]);
+       p = p->next;
+    }
+    
+    return head;
 }
 
-int main(void){
-    Codec s;
-    TreeNode* root = new TreeNode(1);
-    root->left = new TreeNode(2);
-    root->right = new TreeNode(3);
-    root->right->left = new TreeNode(4);
-    root->right->right = new TreeNode(5);
-    
-    string str = s.serialize(root);
-    cout<<"serial string = "<<str<<endl;
-
-    cout<<"preorder traverse deserial tree"<<endl;
-    auto pNode = s.deserialize(str);
-    PrintTreeNode(pNode);
-    cout<<endl;
+int main() {
+    vector<int> ivec{4,2,3,1};
+    ListNode* head = makeLink(ivec);
+    Solution s;
+    s.sortList(head);
     return 0;
 }
