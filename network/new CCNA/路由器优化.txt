@@ -1,0 +1,11 @@
+en
+conf t
+alias exec a show ip route
+alias exec b show ip inter brief
+alias exec c show running-config
+
+no ip domain lookup
+line console 0
+logging syn
+exec-time 0 0
+end
