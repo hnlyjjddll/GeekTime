@@ -172,10 +172,72 @@ ListNode* makeLink(const vector<int>& ivec){
     return head;
 }
 
+class Test{
+    public:
+        Test(int a){
+            cout<<"construct Test"<<endl;
+        }
+
+        Test(const Test& rhs){
+            cout<<"copy construct Test"<<endl;
+        }
+
+        Test(const Test&& rhs){
+            cout<<"rvalue copy construct Test"<<endl;
+        }
+};
+
+void DeleteRepeatedSpace(std::string& str){
+    if(str.size()<=1){
+        return;
+    }
+
+    int j=1;
+    for(int i=1;i<str.size();++i){
+        if(str[i] != ' ' || str[j-1]!=' '){
+            str[j++] = str[i];
+        }
+    }
+
+    str.resize(j);
+}
+
+struct LinkNode{
+    int val;
+    LinkNode* next;
+    LinkNode(int v):val(v),next(nullptr){}
+};
+
+void remove(char *s, char x){
+    if(!s){
+        return;
+    }
+
+    char* p = s;
+    int i = 0;
+    while(*p!='\0'){
+        if(*p != x){
+            *(s+i) = *p;
+            ++i; 
+        }
+
+        ++p;
+    }
+
+    *(s+i) = '\0';
+}
+
+
 int main() {
-    vector<int> ivec{4,2,3,1};
-    ListNode* head = makeLink(ivec);
-    Solution s;
-    s.sortList(head);
+    char ca[] = "12345";
+    remove(ca,'2');
+    cout<<string(ca)<<endl;
+
+    vector<int*> ivec;
+    ivec.resize(10,new int(1));
+    //ListNode* head = makeLink(ivec);
+    //Solution s;
+    //s.mergeKLists(head);
     return 0;
 }
+
