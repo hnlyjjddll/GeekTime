@@ -24,22 +24,22 @@ public:
             mapPos[inorder[i]] = i;
         }
 
-        return _doBuildTree(mapPos,inorder,0,inorder.size()-1,postorder,0,inorder.size()-1);
+        return _doBuildTree(mapPos,inorder,0,inorder.size()-1,postorder,inorder.size()-1);
     }
 
 private:
-    TreeNode* _doBuildTree(const unordered_map<int,int>& mapPos,const vector<int>& inorder,int iBeg,int iEnd,const vector<int>& postorder,int pBeg,int pEnd){
-        if(iBeg > iEnd || pBeg > pEnd){
+    TreeNode* _doBuildTree(const unordered_map<int,int>& mapPos,const vector<int>& inorder,int iBeg,int iEnd,const vector<int>& postorder,int pEnd){
+        if(iBeg > iEnd){
             return nullptr;
         }
 
         TreeNode* root = new TreeNode(postorder[pEnd]);
         cout<<"iBeg="<<iBeg<<" iEnd="<<iEnd<<endl;
-        cout<<"pBeg="<<pBeg<<" pEnd="<<pEnd<<endl; 
+        cout<<" pEnd="<<pEnd<<endl; 
         int pos = mapPos.at(postorder[pEnd]);
         cout<<"pos="<<pos<<endl;
-        root->left = _doBuildTree(mapPos,inorder,iBeg,pos-1,postorder,iBeg,pos-1);
-        root->right = _doBuildTree(mapPos,inorder,pos+1,iEnd,postorder,pos,pEnd-1);
+        root->left = _doBuildTree(mapPos,inorder,iBeg,pos-1,postorder,pos-1);
+        root->right = _doBuildTree(mapPos,inorder,pos+1,iEnd,postorder,pEnd-1);
         return root;
     }
 };
