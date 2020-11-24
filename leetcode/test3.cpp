@@ -38,7 +38,7 @@ private:
         cout<<" pEnd="<<pEnd<<endl; 
         int pos = mapPos.at(postorder[pEnd]);
         cout<<"pos="<<pos<<endl;
-        root->left = _doBuildTree(mapPos,inorder,iBeg,pos-1,postorder,pos-1);
+        root->left = _doBuildTree(mapPos,inorder,iBeg,pos-1,postorder,pEnd-(iEnd-pos)-1);
         root->right = _doBuildTree(mapPos,inorder,pos+1,iEnd,postorder,pEnd-1);
         return root;
     }
